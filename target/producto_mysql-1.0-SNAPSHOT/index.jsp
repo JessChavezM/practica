@@ -29,7 +29,8 @@
                     <td>${item.precio}</td>
                      <td>${item.cantidad}</td>
                       <td>
-                        <a href="MainServlet?op=editar&id=${item.id}" >Editar</a>
+                        <a href="MainServlet?op=modificar&id=${item.id}" >Editar</a>
+                       
                     </td> 
                     <td>
                         <a href="MainServlet?op=eliminar&id=${item.id}" onclick="return(confirm('Estas seguro?'))">Eliminar</a>

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "MainServlet", urlPatterns = {"/MainServlet"})
 public class MainServlet extends HttpServlet {
-int id;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -56,18 +56,26 @@ int id;
                 request.setAttribute("lib",co);
                 request.getRequestDispatcher("editar.jsp").forward(request,response);  
             }
-             if (op.equals("editar")) {
-               id=Integer.parseInt(request.getParameter("id"));
-                String sql = "select from productos where id_producto=?";
-                ps =conn.prepareStatement(sql);
-               ps.setInt(1,id);
-                Contacto co =new Contacto();
-                request.setAttribute("lib",co);
-                request.getRequestDispatcher("editar.jsp").forward(request,response);  
-             
+              if (op.equals("modificar")) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String sql = "select * from productos where id_producto = ?";
+
+                ps = conn.prepareStatement(sql);
+                ps.setInt(1, id);
+                rs = ps.executeQuery();
+                com.emergentes.modelo.Contacto pr = new com.emergentes.modelo.Contacto();
+                while (rs.next()) {
+
+                    pr.setId(rs.getInt("id_producto"));
+                    pr.setDescripcion(rs.getString("producto"));
+                    pr.setPrecio(rs.getFloat("precio"));
+                    pr.setCantidad(rs.getInt("cantidad"));
+                }
+                request.setAttribute("lib", pr);
+                request.getRequestDispatcher("editar.jsp").forward(request, response);
             }
             if (op.equals("eliminar")) {
-                id=Integer.parseInt(request.getParameter("id"));
+            int    id=Integer.parseInt(request.getParameter("id"));
                 String sql = "delete from productos where id_producto=?";
                 ps =conn.prepareStatement(sql);
                 ps.setInt(1,id);
@@ -89,7 +97,7 @@ int id;
             throws ServletException, IOException {
   try{
 
-       id = Integer.parseInt(request.getParameter("id_producto"));
+       int   id = Integer.parseInt(request.getParameter("id_producto"));
        String producto = request.getParameter("producto");   
        double precio =Double.parseDouble(request.getParameter("precio"));
        int cantidad=  Integer.parseInt(request.getParameter("cantidad"));
@@ -115,27 +123,31 @@ int id;
           ps.executeUpdate();
           response.sendRedirect("MainServlet");
        }
-       else
-           {
-          String sql="UPDATE productos SET producto=? ,precio=?, cantidad=? where id_producto="+id;
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, con.getDescripcion());
-          ps.setDouble(2, con.getPrecio());
-          ps.setInt(3, con.getCantidad());
-   
-          ps.executeUpdate();
-          response.sendRedirect("MainServlet");
-  
-       }
-      
+    else {
+
+            //edicion de registro
+            String sql = "update productos set producto = ?, precio = ?, cantidad = ? where id_producto = ?";
+            try {
+                ps = conn.prepareStatement(sql);
+
+                 ps.setString(1, con.getDescripcion());
+                ps.setDouble(2, con.getPrecio());
+                ps.setInt(3, con.getCantidad());
+                ps.setInt(4, con.getId());
+                ps.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println("error en sql " + ex.getMessage());
+            } finally {
+                canal.desconectar();
+            }
+            response.sendRedirect("MainServlet");
+        }
 
        }catch(SQLException e){ 
            System.out.println("Error en SQL "+ e.getMessage());
   }       
-    }
-
-   
-       
+    }     
 }
 
 

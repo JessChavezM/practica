@@ -11,7 +11,10 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>NuevoProductos</h1>
+           <h1>
+           
+            <c:if test="${lib.id != 0}">Editar Producto</c:if>
+            </h1>
         <form action="MainServlet" method="post">
             <input type="hidden" name="id_producto" value="${lib.id}">
           <table>
